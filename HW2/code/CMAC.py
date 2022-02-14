@@ -7,6 +7,8 @@ import math
 import random
 import time
 
+from sqlalchemy import true
+
 
 
 # Preparing dataset using sin(x) function to train 1-D CMAC
@@ -28,10 +30,29 @@ def dataGenerator(input):
 
     return [x, y, x_train, x_test, y_train, y_test, index_train, index_test, step_size_rad]
 
-# Defining CMAC whose inputs are either discrete or continous
-def CMAC(input):
+def CMAC_train():
 
-    return e_train, e_test
+    return true
+def CMAC_test():
+
+    return true
+# Defining CMAC whose inputs are either discrete or continous
+def CMAC(model_type):
+    i = 0
+    timer = time.time()
+    while i < 20:
+        # Training the CMAC model 
+        CMAC_train()
+        # Estimating error for train and test weights
+        CMAC_train_y, train_c_error = CMAC_test('train', model_type)
+        err_train = train_c_error / size_x_data
+        CMAC_test_y, test_c_error = CMAC_test('test', model_type)
+        err_test = test_c_error / size_test_data
+        i = i+1
+    timer = time.time() - timer
+    #plotting train vs test CMAC output
+        
+    return err_train, err_test
 
 # Initializing neccessary global variables
 # Train and Test data for training the model
