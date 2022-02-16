@@ -50,7 +50,7 @@ def CMAC_train():
             for j in range(0, GF):
                 total_n_index = t_index - (j - n_index)
 
-                if total_n_index >=0 and total_n_index < x_data:
+                if total_n_index >=0 and total_n_index < size_x_data:
                     weights[total_n_index] = weights[total_n_index] + (err / (GF + o_val)) * learn_rate
                     c_out = c_out + x_data[total_n_index] * weights[total_n_index]
             err = train_y_data[i] - c_out
@@ -79,7 +79,7 @@ def CMAC_test(d_type, c_type):
         else :
             dex = (np.abs(np.array(x_data)- i_data[i])).np.argmin()
 
-        e_index = float((x_data[index] - i_data[i])/ step_size)
+        e_index = float((x_data[dex] - i_data[i])/ step_size)
         #slidding window to left,  overlapping partially 
         if e_index <0:
             max_offset =  0
@@ -110,12 +110,14 @@ def CMAC_test(d_type, c_type):
                     w = weights[total_n_index]
                 
                 c_out[i] += x_data[total_n_index] * w
-    
-        c_error += abs(math.pow(( t_output[i] - c_out[i], 2)))
+
+        c_error += abs(powerEval(t_output[i], c_out[i]))
         print('CMAC:', c_out)
     return c_out, c_error
         
-                
+def powerEval(a, b):
+    reult_ev = math.pow((a - b),2)
+    return reult_ev            
 
 
 # Defining CMAC whose inputs are either discrete or continous
@@ -162,3 +164,7 @@ GF = 5
 # neighbourhood index
 n_index = int(math.floor(GF / 2))
 learn_rate = 0.15
+
+
+
+TrainErrorDiscrete, TestErrorDiscrete = CMAC('Discrete')
