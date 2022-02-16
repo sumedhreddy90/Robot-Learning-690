@@ -1,5 +1,5 @@
 from cmath import pi
-from operator import le
+from operator import index, le
 import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
@@ -61,9 +61,63 @@ def CMAC_train():
             if abs(math.pow((train_y_data[i] - c_out),2)) <= 0.001:
                convergence = True 
 
-def CMAC_test():
+def CMAC_test(d_type, c_type):
+    c_error = 0 #cumulative error
+    if d_type == 'train':
+        i_data = train_x_data
+        t_output = train_y_data
+        t_indices = train_index
+    else :
+        i_data = test_x_data
+        t_output = test_y_data
+        t_indices = train_index
+    c_out = [0 for i in range(0, len(i_data))]
 
-    return true
+    for i in range(0, len(i_data)):
+        if d_type == 'train':
+            dex = t_indices[i]
+        else :
+            dex = (np.abs(np.array(x_data)- i_data[i])).np.argmin()
+
+        e_index = float((x_data[index] - i_data[i])/ step_size)
+        #slidding window to left,  overlapping partially 
+        if e_index <0:
+            max_offset =  0
+            min_offset = -1
+        #slidding window to right, overlapping partially
+        elif e_index > 0:
+            max_offset = 1
+            min_offset = 0
+
+        else: 
+            max_offset = 0
+            min_offset = 0 
+        
+        for j in range(min_offset, GF+ max_offset):
+            total_n_index = dex - (j - n_index)
+            if total_n_index >= 0 and n_index < size_x_data:
+                if j is min_offset:
+                    if c_type == 'Discrete':
+                        w = weights[total_n_index]
+                    if c_type == 'Continuous':
+                        w = weights[total_n_index] * (1- abs(e_index))
+                elif j is GF + max_offset:
+                    if c_type  == 'Discrete':
+                        w = 0
+                    if c_type == 'Continuous':
+                        w = weights[total_n_index] * abs(e_index)
+                else:
+                    w = weights[total_n_index]
+                
+                c_out[i] += x_data[total_n_index] * w
+    
+        c_error += abs(math.pow(( t_output[i] - c_out[i], 2)))
+        print('CMAC:', c_out)
+    return c_out, c_error
+        
+                
+
+
 # Defining CMAC whose inputs are either discrete or continous
 def CMAC(model_type):
     i = 0
