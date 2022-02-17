@@ -7,6 +7,7 @@ cd code
 python3 CMAC.py 
 ```
 ## Output
+```python
 Length of generated input data:  100
 Length of train data: 70
 Length of test data: 30
@@ -26,3 +27,4 @@ Continuous Test Error:  0.010687383395948736
 Continuous Train accuracy 99.96839233913043
 Continuous Test accuracy 98.93126166040513
 #######################################################
+```
