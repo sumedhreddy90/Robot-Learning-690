@@ -34,3 +34,6 @@ Continuous Test accuracy: 98.93126166040513
 ![Figure_3](https://user-images.githubusercontent.com/24978535/154541266-1cce515f-0143-423a-91a4-de54b7251bf9.png)
 ![Figure_4](https://user-images.githubusercontent.com/24978535/154541276-ab541fa2-d593-45a4-81cc-9c0ae34ce036.png)
 ![Figure_5](https://user-images.githubusercontent.com/24978535/154541289-3cf35cf8-eba6-4737-ab59-1d99e007fe9b.png)
+![Figure_6](https://user-images.githubusercontent.com/24978535/154543692-45b42611-7dd0-477f-a028-446525fe1df3.png)
+![Figure_7](https://user-images.githubusercontent.com/24978535/154543708-851e41e8-5f74-43de-95f3-43c0ff73764d.png)
+
