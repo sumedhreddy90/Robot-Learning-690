@@ -1,4 +1,4 @@
-# Robot-Learning-690
+# Robot Learning ENPM690: Projects and Assignment Repo
 
 ## Usage
 ```python
