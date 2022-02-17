@@ -241,4 +241,22 @@ plt.title('Test Continuous CMAC output' + '\n for given input test data: ' + str
 plt.plot(test_x_data,test_y_data, 'o', c='green',label='Test Data output')
 plt.plot(test_x_c ,test_y_c, '^', c='red', label='Continuous CMAC output')
 plt.legend()
+
+plt.figure(6)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Train CMAC comparision between discrete and continous')
+plt.plot(train_x_d,train_y_d, 'o', c='blue',label='Discrete CMAC output')
+plt.plot(train_x_c ,train_y_c, '^', c='pink', label='Continuous CMAC output')
+plt.legend()
+
+
+plt.figure(7)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Test CMAC comparision between discrete and continous')
+plt.plot(test_x_d,test_y_d, 'o', c='blue',label='Discrete CMAC output')
+plt.plot(test_x_c ,test_y_c, '^', c='pink', label='Continuous CMAC output')
+plt.legend()
+
 plt.show()
