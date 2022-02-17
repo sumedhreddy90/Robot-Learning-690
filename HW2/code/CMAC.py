@@ -7,11 +7,8 @@ import math
 import random
 import time
 
-from sqlalchemy import true
 
-
-
-# Preparing dataset using sin(x) function to train 1-D CMAC
+# Preparing dataset using Cos(x) function to train 1-D CMAC
 # Creating and sampling my function at 100 evenly spaced points
 def dataGenerator(input):
     max = 360 # In degrees
@@ -31,7 +28,7 @@ def dataGenerator(input):
     return [x, y, x_train, x_test, y_train, y_test, index_train, index_test, step_size_rad]
 
 def CMAC_train():
-    e =1000 
+    err =1000 
     for i in range(0, size_train_data):
        convergence = False
        t_index = train_index[i]
@@ -47,20 +44,24 @@ def CMAC_train():
         # iterate through untill convergence is obtained
        while convergence is False:
             c_out = 0
-            for j in range(0, GF):
+            for j in range(0, g_factor):
                 total_n_index = t_index - (j - n_index)
 
                 if total_n_index >=0 and total_n_index < size_x_data:
-                    weights[total_n_index] = weights[total_n_index] + (err / (GF + o_val)) * learn_rate
+                    weights[total_n_index] = weights[total_n_index] + (err / (g_factor + o_val)) * learn_rate
                     c_out = c_out + x_data[total_n_index] * weights[total_n_index]
             err = train_y_data[i] - c_out
             iter = iter + 1
             if iter > 35:
                 break
             # convergence threshold 0.001
-            if abs(math.pow((train_y_data[i] - c_out),2)) <= 0.001:
+            if abs(powerEval(train_y_data[i], c_out)) <= 0.001:
                convergence = True 
 
+def key(arr, value):
+    i_val = (np.abs(np.array(arr) - value)).argmin()
+    return i_val
+    
 def CMAC_test(d_type, c_type):
     c_error = 0 #cumulative error
     if d_type == 'train':
@@ -70,14 +71,15 @@ def CMAC_test(d_type, c_type):
     else :
         i_data = test_x_data
         t_output = test_y_data
-        t_indices = train_index
+        t_indices = test_index
+
     c_out = [0 for i in range(0, len(i_data))]
 
     for i in range(0, len(i_data)):
         if d_type == 'train':
             dex = t_indices[i]
         else :
-            dex = (np.abs(np.array(x_data)- i_data[i])).np.argmin()
+            dex = key(x_data, i_data[i])
 
         e_index = float((x_data[dex] - i_data[i])/ step_size)
         #slidding window to left,  overlapping partially 
@@ -93,15 +95,15 @@ def CMAC_test(d_type, c_type):
             max_offset = 0
             min_offset = 0 
         
-        for j in range(min_offset, GF+ max_offset):
+        for j in range(min_offset, g_factor + max_offset):
             total_n_index = dex - (j - n_index)
-            if total_n_index >= 0 and n_index < size_x_data:
+            if total_n_index >= 0 and total_n_index < size_x_data:
                 if j is min_offset:
                     if c_type == 'Discrete':
                         w = weights[total_n_index]
                     if c_type == 'Continuous':
                         w = weights[total_n_index] * (1- abs(e_index))
-                elif j is GF + max_offset:
+                elif j is g_factor + max_offset:
                     if c_type  == 'Discrete':
                         w = 0
                     if c_type == 'Continuous':
@@ -112,7 +114,6 @@ def CMAC_test(d_type, c_type):
                 c_out[i] += x_data[total_n_index] * w
 
         c_error += abs(powerEval(t_output[i], c_out[i]))
-        print('CMAC:', c_out)
     return c_out, c_error
         
 def powerEval(a, b):
@@ -134,13 +135,12 @@ def CMAC(model_type):
         err_test = test_c_error / size_test_data
         i = i+1
     timer = time.time() - timer
-    #plotting train vs test CMAC output
         
-    return err_train, err_test
+    return err_train, err_test, CMAC_train_y, CMAC_test_y
 
 # Initializing neccessary global variables
 # Train and Test data for training the model
-data = dataGenerator(np.sin)
+data = dataGenerator(np.cos)
 x_data = data[0]
 y_data = data[1]
 train_x_data = data[2]
@@ -160,11 +160,76 @@ print("Length of test data:",size_test_data)
 CMAC_train_y = [0]
 weights = [0 for i in range(0,size_x_data)]
 # generalization factor
-GF = 5
+g_factor = 5
 # neighbourhood index
-n_index = int(math.floor(GF / 2))
+n_index = int(math.floor(g_factor / 2))
 learn_rate = 0.15
 
 
+    
 
-TrainErrorDiscrete, TestErrorDiscrete = CMAC('Discrete')
+train_e_discrete, test_e_discrete, train_CMAC_discrete, test_CMAC_discrete = CMAC('Discrete')
+train_x_d = [x for (y, x) in sorted(zip(train_index, train_x_data))]
+train_y_d = [x for (y, x) in sorted(zip(train_index, train_CMAC_discrete))]
+test_x_d = [x for (y, x) in sorted(zip(test_index, test_x_data))]
+test_y_d = [x for (y, x) in sorted(zip(test_index, test_CMAC_discrete))]
+
+train_e_continuous, test_e_continuous, train_CMAC_continuous, test_CMAC_continuous  = CMAC('Continuous')
+train_x_c = [x for (y, x) in sorted(zip(train_index, train_x_data))]
+train_y_c = [x for (y, x) in sorted(zip(train_index, train_CMAC_continuous))]
+test_x_c = [x for (y, x) in sorted(zip(test_index, test_x_data))]
+test_y_c = [x for (y, x) in sorted(zip(test_index, test_CMAC_continuous))]
+
+print('#######################################################')
+print("")
+print('################Discrete CMAC Results#################')
+print('Discrete Train and Test Error with Accuracy report')
+print('Discrete Train Error: ', train_e_discrete)
+print('Discrete Test Error: ', test_e_discrete)
+train_accuracy_d = (1- train_e_discrete)*100
+test_accuracy_d = (1- test_e_discrete)*100
+print('Discrete Train accuracy', train_accuracy_d)
+print('Discrete Test accuracy', test_accuracy_d)
+print("")
+print('################Continous CMAC Results#################')
+print('Continuous Train and Test Error with Accuracy report')
+print('Continuous Train Error: ', train_e_continuous)
+print('Continuous Test Error: ', test_e_continuous)
+train_accuracy_c = (1- train_e_continuous)*100
+test_accuracy_c = (1- test_e_continuous)*100
+print('Continuous Train accuracy', train_accuracy_c)
+print('Continuous Test accuracy', test_accuracy_c)
+print('#######################################################')
+
+plt.figure(1)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Trained Discrete CMAC output' + '\n for given input train data: ' + str(size_train_data))
+plt.plot(train_x_data,train_y_data, 'o', c='green',label='Train Data output')
+plt.plot(train_x_d ,train_y_d, '^', c='red', label='Discrete CMAC output')
+plt.legend()
+
+plt.figure(2)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Test Discrete CMAC output' + '\n for given input test data: ' + str(size_test_data))
+plt.plot(test_x_data,test_y_data, 'o', c='green',label='Test Data output')
+plt.plot(test_x_d ,test_y_d, '^', c='red', label='Discrete CMAC output')
+plt.legend()
+
+plt.figure(3)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Trained Continuous CMAC output' + '\n for given input train data: ' + str(size_train_data))
+plt.plot(train_x_data,train_y_data, 'o', c='green',label='Train Data output')
+plt.plot(train_x_c ,train_y_c, '^', c='red', label='Continuous CMAC output')
+plt.legend()
+
+plt.figure(4)
+plt.xlabel('Input data')
+plt.ylabel('Output data')
+plt.title('Test Continuous CMAC output' + '\n for given input test data: ' + str(size_test_data))
+plt.plot(test_x_data,test_y_data, 'o', c='green',label='Test Data output')
+plt.plot(test_x_c ,test_y_c, '^', c='red', label='Continuous CMAC output')
+plt.legend()
+plt.show()
